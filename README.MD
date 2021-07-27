@@ -71,6 +71,21 @@ apt-get install libfdk-aac-dev
 
 You also need to install go from https://golang.org/dl/ as version 1.16 is not supplied by buster (they only support 1.11)
 
+##### Raspberry 1 (arm6l)
+
+You can not rely on deb-multimedia, they only ship armv7 binary
+
+You will have to compile manually lib-fdk-aac
+
+````
+git clone --depth 1 https://github.com/mstorsjo/fdk-aac.git ~/ffmpeg-libraries/fdk-aac \
+  && cd ~/ffmpeg-libraries/fdk-aac \
+  && autoreconf -fiv \
+  && ./configure \
+  && make -j$(nproc) \
+  && sudo make install
+````
+
 #### Mac os build 
 
 * Having xcode properly installed (clang needed)
@@ -78,27 +93,6 @@ You also need to install go from https://golang.org/dl/ as version 1.16 is not s
 ````shell
 brew install portaudio fdk-aac go 
 ````
-
-### Docker image
-
-You can build the image to test Linux build and that the service run properly 
-
-* Build the image
-
-```shell
-docker build -t albanseurat/goplay2:latest .
-```
-
-* Run the container
-
-```shell
-docker run -p 7000:7000 -it albanseurat/goplay2:latest
-```
-
-#### Acknowledgments  
-
-* Docker build is intended to test building the program on Linux platform
-* Bonjour/mDns implementation needs to be changed to allow exposing airplay service outside docker container
 
 ## Run
 
@@ -128,9 +122,11 @@ Ex: It takes around 60ms on my mac to launch the audio stream at the **Anchor Ti
 
 `sink` (pulse audio sink name) to replace default sink
 
+`nosync` (No Audio sync) disable experimental audio sync
+
 Example : 
 ```shell
-./goplay2 -sink alsa_output -i en0 -n aiwa
+./goplay2 -sink alsa_output -i en0 -n aiwa -nosync
 ```
 
 
